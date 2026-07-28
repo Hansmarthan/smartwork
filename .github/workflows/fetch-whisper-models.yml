@@ -15,26 +15,26 @@ permissions:
 jobs:
   fetch-models:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
-      - name: Download multilingual Whisper models
+      - name: Download multilingual Whisper Tiny models
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p models
           curl -L --fail --retry 4 --retry-delay 5 \
-            -o models/ggml-base-q5_1.bin \
-            'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base-q5_1.bin?download=true'
+            -o models/ggml-tiny.bin \
+            'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin?download=true'
           curl -L --fail --retry 4 --retry-delay 5 \
-            -o models/ggml-small-q5_1.bin \
-            'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q5_1.bin?download=true'
+            -o models/ggml-tiny-q5_1.bin \
+            'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny-q5_1.bin?download=true'
           sha256sum models/* | tee models/SHA256SUMS.txt
           ls -lh models
 
-      - name: Upload Whisper models
+      - name: Upload Whisper Tiny models
         uses: actions/upload-artifact@v4
         with:
-          name: whisper-models-ko
+          name: whisper-tiny-ko
           path: models/
           compression-level: 0
           retention-days: 1
