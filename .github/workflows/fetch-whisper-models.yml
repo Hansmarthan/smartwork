@@ -1,0 +1,41 @@
+name: Fetch Whisper models
+
+on:
+  push:
+    branches:
+      - temp-transcription-model-20260728
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-models:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Download multilingual Whisper models
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p models
+          curl -L --fail --retry 4 --retry-delay 5 \
+            -o models/ggml-base-q5_1.bin \
+            'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base-q5_1.bin?download=true'
+          curl -L --fail --retry 4 --retry-delay 5 \
+            -o models/ggml-small-q5_1.bin \
+            'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q5_1.bin?download=true'
+          sha256sum models/* | tee models/SHA256SUMS.txt
+          ls -lh models
+
+      - name: Upload Whisper models
+        uses: actions/upload-artifact@v4
+        with:
+          name: whisper-models-ko
+          path: models/
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
