@@ -35,7 +35,7 @@ jobs:
           set -euo pipefail
           curl -L --fail --retry 3 \
             -o ggml-silero-v6.2.0.bin \
-            https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-silero-v6.2.0.bin
+            https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v6.2.0.bin
           test -s ggml-silero-v6.2.0.bin
           ls -lh ggml-silero-v6.2.0.bin
 
