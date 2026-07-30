@@ -1,0 +1,39 @@
+name: Temporary Whisper Model Artifact
+
+on:
+  push:
+    branches:
+      - tmp-transcription-runtime-20260729
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct multilingual Whisper small Q5_1 model
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/advexplorer/whisper.git /tmp/whisper-model
+          cat /tmp/whisper-model/ggml-small-q5_1.bin.part-* > ggml-small-q5_1.bin
+          echo "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb  ggml-small-q5_1.bin" | sha256sum --check
+          ls -lh ggml-small-q5_1.bin
+
+      - name: Upload temporary model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: whisper-small-q5_1-model
+          path: ggml-small-q5_1.bin
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
