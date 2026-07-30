@@ -1,4 +1,4 @@
-name: Temporary Whisper Model Artifact
+name: Temporary Whisper Runtime Artifacts
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  package-model:
+  package-models:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -29,11 +29,30 @@ jobs:
           echo "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb  ggml-small-q5_1.bin" | sha256sum --check
           ls -lh ggml-small-q5_1.bin
 
-      - name: Upload temporary model artifact
+      - name: Download Silero VAD model
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 \
+            -o ggml-silero-v6.2.0.bin \
+            https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-silero-v6.2.0.bin
+          test -s ggml-silero-v6.2.0.bin
+          ls -lh ggml-silero-v6.2.0.bin
+
+      - name: Upload temporary Whisper model artifact
         uses: actions/upload-artifact@v4
         with:
           name: whisper-small-q5_1-model
           path: ggml-small-q5_1.bin
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Upload temporary VAD model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: whisper-silero-vad-model
+          path: ggml-silero-v6.2.0.bin
           compression-level: 0
           retention-days: 1
           if-no-files-found: error
